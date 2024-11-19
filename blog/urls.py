@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (RegisterView, LoginView, LogoutView, 
                     PasswordResetView, PasswordResetConfirmView, 
                     TOTPDeviceView, BlogPostListCreateView, 
-                    BlogPostRetrieveUpdateDestroyView)
+                    BlogPostRetrieveUpdateDestroyView,
+                    CommentListCreateView, CommentRetrieveUpdateDestroyView)
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -13,4 +14,6 @@ urlpatterns = [
     path('totp/', TOTPDeviceView.as_view(), name='totp'),
     path('posts/', BlogPostListCreateView.as_view(), name='post-list-create'),
     path('posts/<int:pk>/', BlogPostRetrieveUpdateDestroyView.as_view(), name='post-detail'),
+    path('comments/', CommentListCreateView.as_view(), name='comment-list-create'),
+    path('comments/<int:pk>/', CommentRetrieveUpdateDestroyView.as_view(), name='comment-detail'),
 ]
