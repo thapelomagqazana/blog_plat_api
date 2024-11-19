@@ -1,0 +1,117 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.sqlite3
+
+# Local environment settings
+.env
+*.env
+
+# Virtual environment
+venv/
+env/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Pycharm
+*.iml
+.idea
+*.ipr
+*.iws
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Static files
+/staticfiles/
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Media files
+/media/
+
+# Node modules (if you are using Node.js for frontend)
+node_modules/
+
+# Docker
+*.pid
+*.seed
+*.pid.lock
+**/Dockerfile
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+*.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Testing
+.test*
+tests_output.xml
+test-results/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Logs
+*.log
+logs/
+
+# Heroku
+*.heroku
+
+# Generated files by Sphinx documentation
+docs/_build/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
