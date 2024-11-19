@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_otp.plugins.otp_totp.models import TOTPDevice
+from .models import BlogPost
 
 User = get_user_model()
 
@@ -23,3 +24,8 @@ class TOTPDeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = TOTPDevice
         fields = ('id', 'name', 'confirmed')
+
+class BlogPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlogPost
+        fields = '__all__'
