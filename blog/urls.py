@@ -3,7 +3,8 @@ from .views import (RegisterView, LoginView, LogoutView,
                     PasswordResetView, PasswordResetConfirmView, 
                     TOTPDeviceView, BlogPostListCreateView, 
                     BlogPostRetrieveUpdateDestroyView,
-                    CommentListCreateView, CommentRetrieveUpdateDestroyView)
+                    CommentListCreateView, CommentRetrieveUpdateDestroyView,
+                    LikePostView, UnlikePostView)
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -16,4 +17,6 @@ urlpatterns = [
     path('posts/<int:pk>/', BlogPostRetrieveUpdateDestroyView.as_view(), name='post-detail'),
     path('comments/', CommentListCreateView.as_view(), name='comment-list-create'),
     path('comments/<int:pk>/', CommentRetrieveUpdateDestroyView.as_view(), name='comment-detail'),
+    path('posts/<int:pk>/like/', LikePostView.as_view(), name='like-post'),
+    path('posts/<int:pk>/unlike/', UnlikePostView.as_view(), name='unlike-post'),
 ]

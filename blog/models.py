@@ -38,6 +38,7 @@ class BlogPost(models.Model):
         author (ForeignKey): A reference to the CustomUser who authored the post.
         created_at (DateTimeField): The datetime when the post was created. Automatically set on creation.
         updated_at (DateTimeField): The datetime when the post was last updated. Automatically set on update.
+        likes (ManyToManyField): A many-to-many relationship with CustomUser representing users who liked the post.
         
     Methods:
         __str__(): Returns the string representation of the BlogPost (its title).
@@ -50,6 +51,8 @@ class BlogPost(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    likes = models.ManyToManyField(CustomUser, related_name='liked_posts', through='Like')
+
 
     def __str__(self):
         return self.title
@@ -58,6 +61,7 @@ class BlogPost(models.Model):
         ordering = ['-created_at']
 
 class Comment(models.Model):
+    
     """
     Represents a comment on a blog post. Supports nested comments for replies.
     
@@ -78,10 +82,34 @@ class Comment(models.Model):
     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
     def __str__(self):
         """
         Returns:
             str: A string representation of the comment, showing the author and the post.
         """
         return f'Comment by {self.author} on {self.post}'
+    
+class Like(models.Model):
+    """
+    Represents a "like" on a blog post by a user.
+    
+    Attributes:
+        user (ForeignKey): The user who liked the post.
+        post (ForeignKey): The blog post that was liked.
+        created_at (DateTimeField): The date and time when the like was created. Automatically set on creation.
+        
+    Meta:
+        unique_together (tuple): Ensures that a user can like a specific post only once.
+    """
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """
+        Meta options for the Like model.
+        
+        Attributes:
+            unique_together (tuple): Defines a composite unique constraint on user and post.
+        """
+        unique_together = ('user', 'post')

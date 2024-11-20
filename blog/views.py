@@ -10,8 +10,8 @@ from django_rest_passwordreset.views import ResetPasswordRequestToken, ResetPass
 from .serializers import UserSerializer, LoginSerializer, TOTPDeviceSerializer
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.core.cache import cache
-from .models import (BlogPost, Comment)
-from .serializers import (BlogPostSerializer, CommentSerializer)
+from .models import (BlogPost, Comment, Like)
+from .serializers import (BlogPostSerializer, CommentSerializer, LikeSerializer)
 
 class RegisterView(generics.CreateAPIView):
     """
@@ -270,3 +270,72 @@ class CommentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             serializer (CommentSerializer): Serializer instance for the comment.
         """
         serializer.save(author=self.request.user)
+
+class LikePostView(generics.CreateAPIView):
+    """
+    View to handle liking a blog post.
+    
+    Attributes:
+        queryset: Retrieves all like instances.
+        serializer_class: Serializer used for creating a like.
+        permission_classes: Allows access to authenticated users only.
+        
+    Methods:
+        post(request, *args, **kwargs): Handles the creation of a like for a blog post, ensuring a user can like a post only once.
+    """
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles the POST request to like a blog post.
+        
+        Args:
+            request: HTTP request containing user and post data.
+            
+        Returns:
+            Response: Success message if like is created, or error if the post is already liked.
+        """
+        post_id = self.kwargs['pk']
+        user = request.user
+        post = BlogPost.objects.get(pk=post_id)
+        if Like.objects.filter(user=user, post=post).exists():
+            return Response({"detail": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+        Like.objects.create(user=user, post=post)
+        return Response({"detail": "Post liked."}, status=status.HTTP_201_CREATED)
+
+class UnlikePostView(generics.DestroyAPIView):
+    """
+    View to handle unliking a blog post.
+    
+    Attributes:
+        queryset: Retrieves all like instances.
+        serializer_class: Serializer used for deleting a like.
+        permission_classes: Allows access to authenticated users only.
+        
+    Methods:
+        delete(request, *args, **kwargs): Handles the deletion of a like for a blog post, ensuring a user can only unlike posts they have liked.
+    """
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Handles the DELETE request to unlike a blog post.
+        
+        Args:
+            request: HTTP request containing user and post data.
+            
+        Returns:
+            Response: Success message if like is deleted, or error if the post was not liked.
+        """
+        post_id = self.kwargs['pk']
+        user = request.user
+        post = BlogPost.objects.get(pk=post_id)
+        like = Like.objects.filter(user=user, post=post).first()
+        if like:
+            like.delete()
+            return Response({"detail": "Post unliked."}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "You have not liked this post."}, status=status.HTTP_400_BAD_REQUEST)
