@@ -61,7 +61,6 @@ node_modules/
 *.pid
 *.seed
 *.pid.lock
-**/Dockerfile
 
 # Coverage reports
 htmlcov/
