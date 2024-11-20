@@ -4,7 +4,7 @@ from .views import (RegisterView, LoginView, LogoutView,
                     TOTPDeviceView, BlogPostListCreateView, 
                     BlogPostRetrieveUpdateDestroyView,
                     CommentListCreateView, CommentRetrieveUpdateDestroyView,
-                    LikePostView, UnlikePostView)
+                    LikePostView, UnlikePostView, AnalyticsView)
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -19,4 +19,5 @@ urlpatterns = [
     path('comments/<int:pk>/', CommentRetrieveUpdateDestroyView.as_view(), name='comment-detail'),
     path('posts/<int:pk>/like/', LikePostView.as_view(), name='like-post'),
     path('posts/<int:pk>/unlike/', UnlikePostView.as_view(), name='unlike-post'),
+    path('analytics/', AnalyticsView.as_view(), name='analytics'),
 ]

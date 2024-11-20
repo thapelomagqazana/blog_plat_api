@@ -113,3 +113,16 @@ class Like(models.Model):
             unique_together (tuple): Defines a composite unique constraint on user and post.
         """
         unique_together = ('user', 'post')
+
+class PostView(models.Model):
+    """
+    Represents a view on a blog post by a user.
+    
+    Attributes:
+        user (ForeignKey): The user who viewed the post.
+        post (ForeignKey): The blog post that was viewed.
+        created_at (DateTimeField): The date and time when the view was recorded. Automatically set on creation.
+    """
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

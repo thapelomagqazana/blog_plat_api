@@ -1,7 +1,7 @@
 from rest_framework import generics, status, views
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
@@ -10,8 +10,9 @@ from django_rest_passwordreset.views import ResetPasswordRequestToken, ResetPass
 from .serializers import UserSerializer, LoginSerializer, TOTPDeviceSerializer
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.core.cache import cache
-from .models import (BlogPost, Comment, Like)
-from .serializers import (BlogPostSerializer, CommentSerializer, LikeSerializer)
+from .models import (BlogPost, Comment, Like, PostView)
+from .serializers import (BlogPostSerializer, CommentSerializer,
+                           LikeSerializer, PostViewSerializer)
 
 class RegisterView(generics.CreateAPIView):
     """
@@ -339,3 +340,39 @@ class UnlikePostView(generics.DestroyAPIView):
             like.delete()
             return Response({"detail": "Post unliked."}, status=status.HTTP_204_NO_CONTENT)
         return Response({"detail": "You have not liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+    
+class AnalyticsView(generics.GenericAPIView):
+    """
+    View to provide analytics data about the application, including users, posts, comments, likes, and views.
+    
+    Attributes:
+        permission_classes: Restricts access to admin users only.
+        
+    Methods:
+        get(request, *args, **kwargs): Retrieves aggregated analytics data and returns it in the response.
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handles the GET request to retrieve analytics data.
+        
+        Args:
+            request: HTTP request.
+            
+        Returns:
+            Response: Aggregated analytics data including counts of active users, posts, comments, likes, and views.
+        """
+        active_users = get_user_model().objects.filter(is_active=True).count()
+        total_posts = BlogPost.objects.count()
+        total_comments = Comment.objects.count()
+        total_likes = Like.objects.count()
+        total_views = PostView.objects.count()
+        data = {
+            "active_users": active_users,
+            "total_posts": total_posts,
+            "total_comments": total_comments,
+            "total_likes": total_likes,
+            "total_views": total_views,
+        }
+        return Response(data, status=status.HTTP_200_OK)

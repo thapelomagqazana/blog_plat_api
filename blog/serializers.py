@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_otp.plugins.otp_totp.models import TOTPDevice
-from .models import (BlogPost, Comment, Like)
+from .models import (BlogPost, Comment, Like, PostView)
 
 User = get_user_model()
 
@@ -71,12 +71,21 @@ class BlogPostSerializer(serializers.ModelSerializer):
         fields (str): Specifies that all fields in the model should be included.
     """
     like_count = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
+    view_count = serializers.SerializerMethodField()
+
     class Meta:
         model = BlogPost
         fields = '__all__'
 
     def get_like_count(self, obj):
         return obj.likes.count()
+    
+    def get_comment_count(self, obj):
+        return obj.comments.count()
+
+    def get_view_count(self, obj):
+        return PostView.objects.filter(post=obj).count()
 
 class CommentSerializer(serializers.ModelSerializer):
     """
@@ -113,5 +122,17 @@ class LikeSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Like
+        fields = '__all__'
+
+class PostViewSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the PostView model.
+    
+    Meta:
+        model (PostView): The model being serialized.
+        fields (str): Specifies that all fields in the PostView model should be included.
+    """
+    class Meta:
+        model = PostView
         fields = '__all__'
 
