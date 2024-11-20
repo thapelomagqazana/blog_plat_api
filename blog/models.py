@@ -126,3 +126,52 @@ class PostView(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     post = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class Notification(models.Model):
+    """
+    Represents a notification sent to a user.
+
+    Attributes:
+        user (ForeignKey): The user associated with the notification. Uses a reverse relationship named 'notifications'.
+        message (TextField): The content of the notification message.
+        is_read (BooleanField): Indicates whether the notification has been read by the user. Defaults to False.
+        created_at (DateTimeField): The date and time when the notification was created. Automatically set on creation.
+
+    Methods:
+        __str__(): Returns a string representation of the notification.
+    """
+    user = models.ForeignKey(CustomUser, related_name='notifications', on_delete=models.CASCADE)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """
+        Returns:
+            str: A string representation of the notification, showing the associated user.
+        """
+        return f'Notification for {self.user}'
+
+
+class NotificationPreference(models.Model):
+    """
+    Represents the notification preferences for a user.
+
+    Attributes:
+        user (OneToOneField): The user associated with the notification preferences. Uses a reverse relationship named 'notification_preference'.
+        email_notifications (BooleanField): Indicates whether the user wants email notifications. Defaults to True.
+        push_notifications (BooleanField): Indicates whether the user wants push notifications. Defaults to True.
+
+    Methods:
+        __str__(): Returns a string representation of the notification preferences.
+    """
+    user = models.OneToOneField(CustomUser, related_name='notification_preference', on_delete=models.CASCADE)
+    email_notifications = models.BooleanField(default=True)
+    push_notifications = models.BooleanField(default=True)
+
+    def __str__(self):
+        """
+        Returns:
+            str: A string representation of the notification preferences, showing the associated user.
+        """
+        return f'Notification preferences for {self.user}'

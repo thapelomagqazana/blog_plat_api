@@ -7,12 +7,15 @@ from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_rest_passwordreset.views import ResetPasswordRequestToken, ResetPasswordConfirm
-from .serializers import UserSerializer, LoginSerializer, TOTPDeviceSerializer
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.core.cache import cache
-from .models import (BlogPost, Comment, Like, PostView)
-from .serializers import (BlogPostSerializer, CommentSerializer,
-                           LikeSerializer, PostViewSerializer)
+from .utils import send_notification
+from .models import (BlogPost, Comment, Like, 
+                     PostView, Notification, NotificationPreference)
+from .serializers import (UserSerializer, LoginSerializer, TOTPDeviceSerializer, 
+                          BlogPostSerializer, CommentSerializer,
+                           LikeSerializer, PostViewSerializer,
+                           NotificationSerializer, NotificationPreferenceSerializer)
 
 class RegisterView(generics.CreateAPIView):
     """
@@ -245,7 +248,8 @@ class CommentListCreateView(generics.ListCreateAPIView):
         Args:
             serializer (CommentSerializer): Serializer instance for the comment.
         """
-        serializer.save(author=self.request.user)
+        comment = serializer.save(author=self.request.user)
+        send_notification(comment.post.author, f'New comment on your post: {comment.content}')
 
 class CommentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -376,3 +380,85 @@ class AnalyticsView(generics.GenericAPIView):
             "total_views": total_views,
         }
         return Response(data, status=status.HTTP_200_OK)
+
+class NotificationListView(generics.ListAPIView):
+    """
+    View to list all notifications for the currently authenticated user.
+
+    Attributes:
+        serializer_class (NotificationSerializer): Serializer used for serializing notification data.
+        permission_classes: Allows access to authenticated users only.
+
+    Methods:
+        get_queryset(): Returns the list of notifications for the current user.
+    """
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Retrieves the notifications for the authenticated user.
+
+        Returns:
+            QuerySet: List of notifications for the current user.
+        """
+        return Notification.objects.filter(user=self.request.user)
+
+
+class MarkNotificationAsReadView(generics.UpdateAPIView):
+    """
+    View to mark a notification as read.
+
+    Attributes:
+        serializer_class (NotificationSerializer): Serializer used for updating notification data.
+        permission_classes: Allows access to authenticated users only.
+
+    Methods:
+        get_queryset(): Returns the notifications for the current user.
+        perform_update(serializer): Marks the notification as read and saves the instance.
+    """
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Retrieves the notifications for the authenticated user.
+
+        Returns:
+            QuerySet: List of notifications for the current user.
+        """
+        return Notification.objects.filter(user=self.request.user)
+
+    def perform_update(self, serializer):
+        """
+        Marks the notification as read and saves the instance.
+
+        Args:
+            serializer (NotificationSerializer): Serializer instance for the notification.
+        """
+        serializer.instance.is_read = True
+        serializer.save()
+
+
+class NotificationPreferenceView(generics.RetrieveUpdateAPIView):
+    """
+    View to retrieve or update the notification preferences for the currently authenticated user.
+
+    Attributes:
+        serializer_class (NotificationPreferenceSerializer): Serializer used for serializing and updating notification preference data.
+        permission_classes: Allows access to authenticated users only.
+
+    Methods:
+        get_object(): Returns the notification preferences for the current user.
+    """
+    serializer_class = NotificationPreferenceSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        """
+        Retrieves the notification preferences for the authenticated user.
+
+        Returns:
+            NotificationPreference: Notification preferences for the current user.
+        """
+        return self.request.user.notification_preference

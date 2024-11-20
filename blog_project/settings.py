@@ -44,8 +44,20 @@ INSTALLED_APPS = [
     'django_rest_passwordreset',
     'django_otp',
     'django_otp.plugins.otp_totp',
+    "channels",
     'blog',  # Blog app
 ]
+
+ASGI_APPLICATION = 'blog_project.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

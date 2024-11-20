@@ -115,3 +115,4 @@ var/
 .installed.cfg
 *.egg
 
+dump.rdb

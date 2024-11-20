@@ -2,7 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_otp.plugins.otp_totp.models import TOTPDevice
-from .models import (BlogPost, Comment, Like, PostView)
+from .models import (BlogPost, Comment, Like,
+                      PostView, Notification, NotificationPreference)
 
 User = get_user_model()
 
@@ -134,5 +135,30 @@ class PostViewSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = PostView
+        fields = '__all__'
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Notification model.
+
+    Meta:
+        model (Notification): The model being serialized.
+        fields (str): Specifies that all fields in the Notification model should be included.
+    """
+    class Meta:
+        model = Notification
+        fields = '__all__'
+
+
+class NotificationPreferenceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the NotificationPreference model.
+
+    Meta:
+        model (NotificationPreference): The model being serialized.
+        fields (str): Specifies that all fields in the NotificationPreference model should be included.
+    """
+    class Meta:
+        model = NotificationPreference
         fields = '__all__'
 

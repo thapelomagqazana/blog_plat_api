@@ -4,7 +4,9 @@ from .views import (RegisterView, LoginView, LogoutView,
                     TOTPDeviceView, BlogPostListCreateView, 
                     BlogPostRetrieveUpdateDestroyView,
                     CommentListCreateView, CommentRetrieveUpdateDestroyView,
-                    LikePostView, UnlikePostView, AnalyticsView)
+                    LikePostView, UnlikePostView, AnalyticsView,
+                    NotificationListView, MarkNotificationAsReadView, 
+                    NotificationPreferenceView)
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -20,4 +22,7 @@ urlpatterns = [
     path('posts/<int:pk>/like/', LikePostView.as_view(), name='like-post'),
     path('posts/<int:pk>/unlike/', UnlikePostView.as_view(), name='unlike-post'),
     path('analytics/', AnalyticsView.as_view(), name='analytics'),
+    path('notifications/', NotificationListView.as_view(), name='notification-list'),
+    path('notifications/<int:pk>/read/', MarkNotificationAsReadView.as_view(), name='mark-notification-read'),
+    path('notification-preferences/', NotificationPreferenceView.as_view(), name='notification-preferences'),
 ]
